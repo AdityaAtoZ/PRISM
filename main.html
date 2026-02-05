@@ -3,1738 +3,1115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FraudGuard - Payment Scam Detection</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>PRISM | Payment Risk & Integrity Surveillance Module</title>
+    
+    <!-- Fonts: Plus Jakarta Sans (Matches reference) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* ==========================
+           DESIGN SYSTEM (Strict Adherence)
+        ========================== */
         :root {
-            --bg-dark: #1a1a1a;
-            --bg-darker: #0f0f0f;
-            --card-bg: rgba(40, 40, 40, 0.6);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --primary: #ff4d6d;
-            --primary-glow: rgba(255, 77, 109, 0.3);
-            --success: #06d6aa0;
-            --warning: #ffc233;
-            --danger: #ff4d6d;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --text-muted: #707070;
+            /* Palette */
+            --bg-color: #dbe0e8;
+            --card-bg: #ffffff;
+            --text-primary: #1a1e23;
+            --text-secondary: #8c909c;
+            --accent-orange: #eb5e28; /* Brand Color */
+            --accent-blue: #5a81fa;
+            --accent-dark: #252b42; 
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            
+            /* UI Tokens */
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 8px;
+            --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.05);
+            --shadow-float: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --font-main: 'Plus Jakarta Sans', sans-serif;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-darker);
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
             color: var(--text-primary);
-            overflow-x: hidden;
-        }
-
-        /* Login Screen */
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1f 100%);
-            position: relative;
+            height: 100vh;
             overflow: hidden;
-        }
-
-        .login-container::before {
-            content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 77, 109, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            top: -200px;
-            right: -200px;
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        .login-container::after {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255, 77, 109, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-            bottom: -100px;
-            left: -100px;
-            animation: pulse 5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-
-        .login-box {
-            background: rgba(30, 30, 30, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 48px;
-            width: 420px;
-            z-index: 1;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-
-        .logo-section {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .logo {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--text-primary);
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary) 0%, #ff6b8a 100%);
-            border-radius: 10px;
-            display: flex;
             align-items: center;
-            justify-content: center;
         }
 
-        .logo-icon svg {
-            width: 24px;
-            height: 24px;
-            color: white;
+        /* Common Components */
+        .btn {
+            border: none; cursor: pointer; font-family: var(--font-main);
+            font-weight: 600; transition: transform 0.1s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
-
-        .login-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .login-subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 32px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: 'Outfit', sans-serif;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.1);
-        }
-
-        .role-selector {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .role-option {
-            flex: 1;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .role-option:hover {
-            border-color: rgba(255, 77, 109, 0.5);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .role-option.active {
-            border-color: var(--primary);
-            background: rgba(255, 77, 109, 0.1);
-        }
-
-        .role-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .role-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
+        .btn:active { transform: scale(0.98); }
         .btn-primary {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--primary) 0%, #ff6b8a 100%);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-family: 'Outfit', sans-serif;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: var(--accent-dark); color: white;
+            padding: 14px 28px; border-radius: 30px;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.3);
+        .btn-danger {
+            background: var(--danger); color: white;
+            padding: 12px 24px; border-radius: 30px;
         }
-
-        /* Dashboard */
-        .dashboard {
-            display: none;
-            min-height: 100vh;
-            background: var(--bg-darker);
-        }
-
-        .dashboard.active {
-            display: block;
-        }
-
-        .dashboard-header {
-            background: var(--bg-dark);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-        }
-
-        .header-logo {
-            font-size: 24px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-title {
-            font-size: 16px;
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .theme-toggle, .notification-btn, .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-secondary);
-        }
-
-        .theme-toggle svg, .notification-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .theme-toggle:hover, .notification-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .user-avatar {
-            background: linear-gradient(135deg, var(--primary) 0%, #ff6b8a 100%);
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .notification-badge {
-            position: relative;
-        }
-
-        .notification-badge::after {
-            content: '';
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            border: 2px solid var(--bg-dark);
-        }
-
-        .main-container {
-            display: flex;
-            min-height: calc(100vh - 81px);
-        }
-
-        .sidebar {
-            width: 80px;
-            background: var(--bg-dark);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .sidebar-item {
-            width: 100%;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            color: var(--text-muted);
-        }
-
-        .sidebar-item svg {
-            width: 22px;
-            height: 22px;
-        }
-
-        .sidebar-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-        }
-
-        .sidebar-item.active {
-            color: var(--text-primary);
-        }
-
-        .sidebar-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            width: 3px;
-            height: 32px;
-            background: var(--primary);
-            border-radius: 0 2px 2px 0;
-        }
-
-        .dashboard-content {
-            flex: 1;
-            padding: 32px 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* World Map Background */
-        .map-background {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 60%;
-            height: 500px;
-            opacity: 0.15;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .content-wrapper {
-            position: relative;
-            z-index: 1;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .page-title {
-            font-size: 32px;
-            font-weight: 600;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-secondary);
-        }
-
-        .btn-icon svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .btn-icon:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-        }
-
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-
+        .btn-ghost { background: transparent; color: var(--text-secondary); transition: 0.2s; }
+        .btn-ghost:hover { color: var(--text-primary); background: #f4f6f9; border-radius: 8px;}
+        
         .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 24px;
-            transition: all 0.3s ease;
+            background: var(--card-bg); border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft); padding: 24px;
         }
 
-        .card:hover {
-            border-color: rgba(255, 255, 255, 0.15);
+        .badge {
+            padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
         }
+        .badge-safe { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-risk { background: #fee2e2; color: #991b1b; }
+        .badge-neutral { background: #f3f4f6; color: #4b5563; }
 
-        .overview-card {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, rgba(80, 80, 80, 0.4) 0%, rgba(60, 60, 60, 0.4) 100%);
-        }
-
-        .overview-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .stat-change {
-            font-size: 14px;
-            font-family: 'JetBrains Mono', monospace;
-            margin-left: 8px;
-        }
-
-        .stat-change.positive {
-            color: var(--success);
-        }
-
-        .stat-change.negative {
-            color: var(--danger);
-        }
-
-        .stat-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .metric-card {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .card-icon {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .card-icon svg {
-            width: 16px;
-            height: 16px;
-            color: var(--text-secondary);
-        }
-
-        .metric-value {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .metric-trend {
-            font-size: 14px;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .mini-chart {
-            margin-top: 16px;
-            height: 60px;
-            position: relative;
-        }
-
-        .chart-line {
-            stroke: currentColor;
-            stroke-width: 2;
-            fill: none;
-        }
-
-        .chart-area {
-            fill: currentColor;
-            opacity: 0.1;
-        }
-
-        /* Map visualization */
-        .map-card {
-            grid-column: 1 / -1;
-            height: 400px;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(135deg, rgba(40, 30, 35, 0.6) 0%, rgba(35, 25, 30, 0.6) 100%);
-        }
-
-        .world-map {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        .map-overlay {
+        /* ==========================
+           TOOLTIP SYSTEM
+        ========================== */
+        [data-tooltip] { position: relative; }
+        [data-tooltip]:hover::after {
+            content: attr(data-tooltip);
             position: absolute;
-            top: 24px;
-            right: 24px;
-            background: rgba(20, 20, 20, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            min-width: 240px;
+            background: var(--accent-dark);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            pointer-events: none;
+            opacity: 0;
+            animation: tooltipIn 0.2s forwards;
+            font-weight: 500;
+        }
+        
+        /* Default: Top */
+        [data-tooltip]:not([data-tooltip-pos="right"]):hover::after {
+            bottom: 100%; left: 50%; transform: translateX(-50%);
+            margin-bottom: 8px;
         }
 
-        .overlay-title {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .overlay-value {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .country-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .country-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .country-name {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .country-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
+        /* Right Position (Sidebar) */
+        [data-tooltip-pos="right"]:hover::after {
+            left: 100%; top: 50%; transform: translateY(-50%);
             margin-left: 12px;
         }
 
-        .bar-fill {
-            height: 6px;
-            border-radius: 3px;
-            background: linear-gradient(90deg, var(--primary) 0%, rgba(255, 77, 109, 0.3) 100%);
-            transition: width 0.5s ease;
-        }
+        @keyframes tooltipIn { to { opacity: 1; } }
 
-        .country-percent {
-            font-size: 13px;
-            font-weight: 600;
-            min-width: 40px;
-            text-align: right;
-        }
 
-        /* Table */
-        .table-card {
-            grid-column: 1 / -1;
-        }
+        /* View Management */
+        .view-section { display: none; width: 100%; height: 100%; }
+        .view-section.active { display: flex; }
 
-        .table-header {
-            display: flex;
-            justify-content: space-between;
+        /* ==========================
+           VIEW 1: AUTHENTICATION
+        ========================== */
+        #auth-view {
             align-items: center;
-            margin-bottom: 20px;
+            justify-content: center;
         }
-
-        .table-tabs {
-            display: flex;
-            gap: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 4px;
-            border-radius: 10px;
+        .auth-container {
+            width: 100%; max-width: 400px; text-align: center;
         }
-
-        .tab-btn {
-            padding: 8px 16px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-family: 'Outfit', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+        .logo-box {
+            width: 50px; height: 50px; background: var(--accent-orange);
+            border-radius: 12px; margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem; transform: rotate(45deg);
         }
-
-        .tab-btn.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
+        .logo-box ion-icon { transform: rotate(-45deg); }
+        
+        .input-field {
+            width: 100%; padding: 16px; margin-bottom: 16px;
+            border: 1px solid #eee; border-radius: var(--radius-md);
+            background: #f8f9fc; font-family: var(--font-main); outline: none;
         }
+        .input-field:focus { border-color: var(--accent-blue); background: white; }
 
-        .detection-mode {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        /* ==========================
+           VIEW 2: MOBILE APP (User)
+        ========================== */
+        #mobile-view {
+            background: var(--bg-color);
+            align-items: center; justify-content: center;
         }
-
-        .mode-label {
-            font-size: 13px;
-            color: var(--text-secondary);
+        .phone-frame {
+            width: 100%; max-width: 390px; height: 95vh; max-height: 844px;
+            background: #f4f6f9; border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden; position: relative;
+            display: flex; flex-direction: column;
         }
+        
+        /* Mobile Content Switcher */
+        .m-content { display: none; flex-direction: column; height: 100%; }
+        .m-content.active { display: flex; }
 
-        .mode-select {
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-family: 'Outfit', sans-serif;
-            font-size: 13px;
-            cursor: pointer;
+        /* Mobile Header */
+        .m-header {
+            padding: 20px 24px; background: white;
+            display: flex; justify-content: space-between; align-items: center;
         }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
+        .user-info-area {
+            cursor: pointer; transition: opacity 0.2s;
         }
-
-        .data-table thead {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .user-info-area:active { opacity: 0.6; }
+        
+        /* Balance Card */
+        .m-balance {
+            margin: 20px; padding: 24px;
+            background: var(--text-primary); color: white;
+            border-radius: var(--radius-lg); position: relative; overflow: hidden;
+            cursor: pointer; transition: transform 0.2s;
         }
-
-        .data-table th {
-            padding: 12px 16px;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .m-balance:active { transform: scale(0.98); }
+        .m-balance h2 { font-size: 2rem; margin: 5px 0 0 0; }
+        .m-balance small { opacity: 0.7; }
+        
+        /* Quick Actions */
+        .m-actions {
+            display: flex; justify-content: space-evenly; margin-bottom: 20px;
         }
-
-        .data-table td {
-            padding: 16px;
-            font-size: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .data-table tr:hover {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-badge.low {
-            background: rgba(6, 214, 160, 0.15);
-            color: var(--success);
-        }
-
-        .status-badge.medium {
-            background: rgba(255, 194, 51, 0.15);
-            color: var(--warning);
-        }
-
-        .status-badge.high {
-            background: rgba(255, 77, 109, 0.15);
-            color: var(--danger);
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        .amount {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
         .action-btn {
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 0.8rem; cursor: pointer;
+        }
+        .action-icon {
+            width: 48px; height: 48px; background: white; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent-orange); font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.2s;
+        }
+        .action-icon:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+
+        /* Lists */
+        .section-title {
+            padding: 0 24px; margin-bottom: 12px;
+            font-weight: 700; font-size: 0.95rem; color: var(--text-primary);
+        }
+        
+        .recent-scroll {
+            display: flex; gap: 16px; overflow-x: auto; padding: 0 24px 20px;
+            scrollbar-width: none;
+        }
+        .recent-item {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            min-width: 60px; cursor: pointer;
+        }
+        .avatar {
+            width: 50px; height: 50px; border-radius: 50%; background: #ddd;
+            background-size: cover; border: 2px solid white;
         }
 
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
+        .contact-list {
+            padding: 0 24px; overflow-y: auto; flex: 1;
+        }
+        .contact-row {
+            display: flex; align-items: center; gap: 16px; padding: 12px 0;
+            border-bottom: 1px solid #eee; cursor: pointer;
+        }
+        .contact-info h4 { font-size: 0.95rem; }
+        .contact-info p { font-size: 0.8rem; color: var(--text-secondary); }
+
+        /* Sub-Pages (QR, Self, History) */
+        .sub-page-header {
+            padding: 20px; background: white; display: flex; align-items: center; gap: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .sub-page-body {
+            padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center;
         }
 
-        /* Chart styling */
-        .chart-container {
-            margin-top: 20px;
-            height: 200px;
+        /* Payment Modal (Overlay) */
+        .payment-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 50;
+            display: none; flex-direction: column; padding: 24px;
+        }
+        .payment-overlay.active { display: flex; }
+        
+        .pay-input-container {
+            flex: 1; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+        }
+        .pay-amount {
+            font-size: 3rem; font-weight: 800; border: none; text-align: center;
+            color: var(--text-primary); outline: none; width: 100%;
         }
 
-        /* Upgrade banner */
-        .upgrade-banner {
-            grid-column: 1 / -1;
-            background: linear-gradient(135deg, rgba(139, 0, 0, 0.3) 0%, rgba(80, 0, 0, 0.3) 100%);
-            border: 1px solid rgba(255, 77, 109, 0.3);
-            padding: 20px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Shared Bottom Sheet Modal Style (Risk, Balance, Profile) */
+        .bottom-modal {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: white; border-top-left-radius: 24px; border-top-right-radius: 24px;
+            padding: 30px; box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+            transform: translateY(100%); transition: transform 0.3s; z-index: 60;
         }
-
-        .banner-text {
-            font-size: 14px;
-            color: var(--text-primary);
+        .bottom-modal.show { transform: translateY(0); }
+        
+        .modal-icon { 
+            width: 60px; height: 60px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; margin: 0 auto 16px;
         }
+        .icon-risk { background: #fff7ed; color: var(--warning); }
+        .icon-error { background: #fef2f2; color: var(--danger); }
+        .icon-profile { background: #eff6ff; color: var(--accent-blue); }
 
-        .btn-upgrade {
-            padding: 10px 24px;
-            background: var(--primary);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-family: 'Outfit', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        /* Profile Modal Specifics */
+        .profile-row {
+            display: flex; justify-content: space-between; width: 100%;
+            padding: 12px 0; border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
         }
+        .profile-label { color: var(--text-secondary); }
+        .profile-val { font-weight: 600; color: var(--text-primary); }
 
-        .btn-upgrade:hover {
-            background: #ff6b8a;
-            transform: translateY(-2px);
+        /* Success Screen */
+        .success-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--success); color: white;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 70;
         }
+        .success-screen.active { display: flex; }
 
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* ==========================
+           VIEW 3: DESKTOP DASHBOARD (Admin)
+        ========================== */
+        #desktop-view {
+            padding: 20px; gap: 20px;
         }
-
-        .card {
-            animation: fadeInUp 0.5s ease backwards;
+        .sidebar {
+            width: 80px; background: var(--card-bg); border-radius: var(--radius-lg);
+            display: flex; flex-direction: column; align-items: center; padding: 30px 0;
+            gap: 24px; height: 100%; box-shadow: var(--shadow-soft);
         }
-
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.2s; }
-        .card:nth-child(3) { animation-delay: 0.3s; }
-        .card:nth-child(4) { animation-delay: 0.4s; }
-        .card:nth-child(5) { animation-delay: 0.5s; }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .grid-layout {
-                grid-template-columns: 1fr;
-            }
-            
-            .overview-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        .nav-icon {
+            font-size: 1.5rem; color: var(--text-secondary); cursor: pointer;
+            padding: 10px; border-radius: 12px; transition: 0.2s; position: relative;
         }
+        .nav-icon.active { background: var(--accent-dark); color: white; }
+        .nav-icon:hover:not(.active) { background: #f4f6f9; color: var(--text-primary); }
 
-        @media (max-width: 768px) {
-            .overview-grid {
-                grid-template-columns: 1fr;
-            }
+        .dashboard-main { flex: 1; display: flex; flex-direction: column; gap: 24px; height: 100%; overflow: hidden; }
+
+        /* Desktop Tabs */
+        .d-tab-content { display: none; flex-direction: column; height: 100%; gap: 24px;}
+        .d-tab-content.active { display: flex; }
+
+        /* Top Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .stat-card {
+            background: white; padding: 20px; border-radius: var(--radius-md);
+            box-shadow: var(--shadow-soft); display: flex; flex-direction: column; justify-content: center;
+            transition: transform 0.2s;
         }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-val { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); }
+        .stat-label { font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; }
+
+        /* Content Grid */
+        .content-split { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; flex: 1; overflow: hidden; }
+        
+        .live-feed-card {
+            background: white; border-radius: var(--radius-lg); padding: 24px;
+            display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-soft);
+        }
+        .table-header {
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding-bottom: 12px;
+            border-bottom: 1px solid #eee; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;
+        }
+        .feed-scroll { overflow-y: auto; flex: 1; }
+        .feed-row {
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 16px 0;
+            border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; align-items: center;
+            cursor: pointer; transition: background 0.1s;
+        }
+        .feed-row:hover { background: #f8f9fc; }
+
+        .risk-map-card {
+            background: white; border-radius: var(--radius-lg); padding: 24px;
+            box-shadow: var(--shadow-soft); display: flex; flex-direction: column;
+        }
+        .region-list { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .region-bar { display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; }
+        .progress-bg { flex: 1; height: 6px; background: #eee; border-radius: 3px; margin: 0 12px; }
+        .progress-fill { height: 100%; border-radius: 3px; background: var(--accent-orange); }
+
+        /* Admin Detail Modal (Centered Overlay) */
+        .admin-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+            z-index: 100; display: none; align-items: center; justify-content: center;
+        }
+        .admin-modal-overlay.active { display: flex; }
+        .detail-box {
+            background: white; padding: 30px; border-radius: var(--radius-lg);
+            width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        .detail-row {
+            display: flex; justify-content: space-between; margin-bottom: 12px;
+            font-size: 0.9rem; border-bottom: 1px solid #eee; padding-bottom: 8px;
+        }
+        .detail-label { color: var(--text-secondary); }
+        .detail-val { font-weight: 600; }
+
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div class="login-container" id="loginScreen">
-        <div class="login-box">
-            <div class="logo-section">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    FraudGuard
-                </div>
-            </div>
+
+    <!-- ==========================
+         VIEW 1: SHARED LOGIN
+    ========================== -->
+    <section id="auth-view" class="view-section active">
+        <div class="auth-container card">
+            <div class="logo-box"><ion-icon name="prism"></ion-icon></div>
+            <h2>PRISM Secure Login</h2>
+            <p style="color:var(--text-secondary); margin-bottom: 30px;">Payment Risk & Integrity Surveillance Module</p>
             
-            <h2 class="login-title">Welcome Back</h2>
-            <p class="login-subtitle">Sign in to access the fraud detection dashboard</p>
-            
-            <div style="background: rgba(6, 214, 160, 0.1); border: 1px solid rgba(6, 214, 160, 0.3); border-radius: 12px; padding: 12px; margin-bottom: 24px;">
-                <div style="font-size: 13px; color: var(--success); margin-bottom: 4px; font-weight: 600;">Demo Credentials Pre-filled</div>
-                <div style="font-size: 12px; color: var(--text-secondary);">Just click "Sign In" to access the dashboard</div>
-            </div>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" placeholder="admin@fraudguard.com" value="admin@fraudguard.com">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-input" placeholder="••••••••" value="admin123">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Role</label>
-                    <div class="role-selector">
-                        <div class="role-option active" data-role="admin">
-                            <div class="role-title">Admin</div>
-                            <div class="role-desc">Surveillance Dashboard</div>
-                        </div>
-                        <div class="role-option" data-role="user">
-                            <div class="role-title">User</div>
-                            <div class="role-desc">Payment Interface</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn-primary">Sign In</button>
+            <form onsubmit="handleLogin(event)">
+                <input type="email" id="emailInput" class="input-field" placeholder="Email Address" required>
+                <input type="password" class="input-field" placeholder="Password" value="123456">
+                <button type="submit" class="btn btn-primary" style="width: 100%" data-tooltip="Enter the system">Sign In</button>
             </form>
+            
+            <div style="margin-top: 20px; font-size: 0.8rem; text-align: left; background: #f4f6f9; padding: 15px; border-radius: 12px;">
+                <strong>Demo Credentials:</strong><br>
+                User: <span style="font-family:monospace">user@test.com</span> (Mobile App)<br>
+                Admin: <span style="font-family:monospace">admin@prism.com</span> (Dashboard)
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Dashboard -->
-    <div class="dashboard" id="dashboardScreen">
-        <!-- Header -->
-        <header class="dashboard-header">
-            <div class="header-left">
-                <div class="header-logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-shield-alt"></i>
+    <!-- ==========================
+         VIEW 2: MOBILE INTERFACE
+    ========================== -->
+    <section id="mobile-view" class="view-section">
+        <div class="phone-frame">
+            
+            <!-- Mobile Home Tab -->
+            <div id="m-home" class="m-content active">
+                <div class="m-header">
+                    <div class="user-info-area" onclick="openProfileModal()" data-tooltip="View Profile">
+                        <small style="color:var(--text-secondary)">Hello,</small>
+                        <h3 id="user-name">Rahul Sharma</h3>
                     </div>
-                    FraudGuard
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="avatar" style="background-image: url('https://i.pravatar.cc/150?img=12')" onclick="openProfileModal()"></div>
+                        <button class="btn-ghost" onclick="handleLogout()" title="Log Out" style="padding: 8px;" data-tooltip="Sign out">
+                            <ion-icon name="log-out-outline" style="font-size: 1.6rem;"></ion-icon>
+                        </button>
+                    </div>
                 </div>
-                <div class="header-title">Fraud Detection Dashboard</div>
-            </div>
-            <div class="header-right">
-                <div class="theme-toggle">
-                    <i class="fas fa-sun"></i>
-                </div>
-                <div class="notification-btn notification-badge">
-                    <i class="fas fa-bell"></i>
-                </div>
-                <div class="user-avatar">A</div>
-            </div>
-        </header>
 
-        <!-- Main Container -->
-        <div class="main-container">
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <div class="sidebar-item active">
-                    <i class="fas fa-chart-line"></i>
+                <div class="m-balance" onclick="switchMobileContent('m-history')" data-tooltip="View Transaction History">
+                    <small>Available Balance</small>
+                    <h2 id="wallet-balance">₹ 24,500</h2>
+                    <ion-icon name="wallet-outline" style="position: absolute; right: 20px; top: 20px; font-size: 2rem; opacity: 0.2;"></ion-icon>
                 </div>
-                <div class="sidebar-item">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="sidebar-item">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <div class="sidebar-item">
-                    <i class="fas fa-file-alt"></i>
-                </div>
-                <div class="sidebar-item">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                <div class="sidebar-item">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <div class="sidebar-item">
-                    <i class="fas fa-cog"></i>
-                </div>
-            </aside>
 
-            <!-- Dashboard Content -->
-            <main class="dashboard-content">
-                <!-- Map Background -->
-                <div class="map-background">
-                    <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Simplified world map outline -->
-                        <path d="M 100 200 Q 150 180 200 200 T 300 200 Q 350 220 400 200 L 450 180 Q 500 190 550 200 L 600 220 Q 650 210 700 200" 
-                              stroke="rgba(255, 77, 109, 0.3)" stroke-width="2" fill="none"/>
-                        <path d="M 120 180 Q 180 160 240 180 L 280 170 Q 320 180 360 190" 
-                              stroke="rgba(255, 77, 109, 0.2)" stroke-width="1.5" fill="none"/>
+                <div class="m-actions">
+                    <div class="action-btn" onclick="switchMobileContent('m-qr')" data-tooltip="Scan QR Code">
+                        <div class="action-icon"><ion-icon name="qr-code-outline"></ion-icon></div>
+                        <span>Scan QR</span>
+                    </div>
+                    <div class="action-btn" onclick="switchMobileContent('m-send')" data-tooltip="Send to Contact">
+                        <div class="action-icon"><ion-icon name="person-outline"></ion-icon></div>
+                        <span>To Contact</span>
+                    </div>
+                    <div class="action-btn" onclick="switchMobileContent('m-self')" data-tooltip="Self Transfer">
+                        <div class="action-icon"><ion-icon name="refresh-outline"></ion-icon></div>
+                        <span>Self</span>
+                    </div>
+                    <div class="action-btn" onclick="switchMobileContent('m-history')" data-tooltip="Check History">
+                        <div class="action-icon"><ion-icon name="grid-outline"></ion-icon></div>
+                        <span>History</span>
+                    </div>
+                </div>
+
+                <div class="section-title">Recent Payees</div>
+                <div class="recent-scroll" id="recent-list">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div class="section-title">All Contacts</div>
+                <div class="contact-list" id="contact-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Mobile: QR Scan View -->
+            <div id="m-qr" class="m-content">
+                <div class="sub-page-header">
+                    <button class="btn-ghost" onclick="switchMobileContent('m-home')"><ion-icon name="arrow-back" style="font-size: 1.5rem;"></ion-icon></button>
+                    <h3>Scan QR Code</h3>
+                </div>
+                <div style="flex: 1; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
+                    <div style="width: 250px; height: 250px; border: 4px solid var(--accent-orange); border-radius: 20px; position: relative;">
+                        <div style="width: 100%; height: 2px; background: red; position: absolute; top: 0; animation: scan 2s infinite;"></div>
+                    </div>
+                    <p style="margin-top: 20px; opacity: 0.7;">Align QR code within frame</p>
+                    <button class="btn btn-primary" style="margin-top: 30px;" onclick="simulateScan()">Simulate Scan</button>
+                </div>
+                <style>@keyframes scan { 0% {top: 0;} 50% {top: 100%;} 100% {top: 0;} }</style>
+            </div>
+
+            <!-- Mobile: Self Transfer View -->
+            <div id="m-self" class="m-content">
+                 <div class="sub-page-header">
+                    <button class="btn-ghost" onclick="switchMobileContent('m-home')"><ion-icon name="arrow-back" style="font-size: 1.5rem;"></ion-icon></button>
+                    <h3>Self Transfer</h3>
+                </div>
+                <div class="sub-page-body">
+                    <div class="card" style="width: 100%; margin-bottom: 20px;">
+                        <small style="color: var(--text-secondary)">From</small>
+                        <h3>PRISM Savings ...8821</h3>
+                        <div style="height: 1px; background: #eee; margin: 10px 0;"></div>
+                        <small style="color: var(--text-secondary)">To</small>
+                        <h3>PRISM Current ...9001</h3>
+                    </div>
+                    <input type="number" class="input-field" placeholder="Amount (₹)" style="font-size: 1.2rem; text-align: center;">
+                    <button class="btn btn-primary" style="width: 100%;" onclick="alert('Funds Transferred Successfully!')">Transfer Now</button>
+                </div>
+            </div>
+
+             <!-- Mobile: Send View -->
+             <div id="m-send" class="m-content">
+                <div class="sub-page-header">
+                   <button class="btn-ghost" onclick="switchMobileContent('m-home')"><ion-icon name="arrow-back" style="font-size: 1.5rem;"></ion-icon></button>
+                   <h3>Send Money</h3>
+               </div>
+               <div style="padding: 10px 20px;">
+                   <input type="text" class="input-field" placeholder="Search name or number..." style="margin-bottom: 0;">
+               </div>
+               <div class="contact-list" id="send-contact-list">
+                   <!-- Replicated contact list -->
+               </div>
+           </div>
+
+            <!-- Mobile: History View -->
+            <div id="m-history" class="m-content">
+                <div class="sub-page-header">
+                    <button class="btn-ghost" onclick="switchMobileContent('m-home')"><ion-icon name="arrow-back" style="font-size: 1.5rem;"></ion-icon></button>
+                    <h3>Transaction History</h3>
+                </div>
+                <div class="sub-page-body" style="align-items: stretch;" id="m-hist-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Payment Overlay -->
+            <div id="payment-overlay" class="payment-overlay">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <button class="btn-ghost" onclick="closePayment()"><ion-icon name="arrow-back" style="font-size: 1.5rem;"></ion-icon></button>
+                    <div>
+                        <small>Paying to</small>
+                        <h4 id="payee-name">Receiver</h4>
+                    </div>
+                </div>
+
+                <div class="pay-input-container">
+                    <small>Enter Amount</small>
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 2rem; font-weight: 700;">₹</span>
+                        <input type="number" id="amount-input" class="pay-amount" placeholder="0" oninput="checkBalance()">
+                    </div>
+                    <small id="bal-hint" style="color: var(--text-secondary); margin-top: 10px;">Available: ₹24,500</small>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%; padding: 18px;" onclick="processPayment()">
+                    Proceed to Pay
+                </button>
+            </div>
+
+            <!-- Risk Warning Modal -->
+            <div id="risk-modal" class="bottom-modal">
+                <div class="modal-icon icon-risk"><ion-icon name="warning"></ion-icon></div>
+                <h3 style="text-align: center; margin-bottom: 10px;">Unusual Activity Detected</h3>
+                <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.5;">
+                    PRISM has flagged this transaction pattern as unusual. 
+                    Only proceed if you personally trust this receiver.
+                </p>
+                <button class="btn btn-danger" style="width: 100%; margin-bottom: 12px;" onclick="confirmPay()">Yes, I Trust Them</button>
+                <button class="btn btn-ghost" style="width: 100%" onclick="closePayment()">Cancel Transaction</button>
+            </div>
+
+            <!-- Insufficient Balance Modal -->
+            <div id="balance-error-modal" class="bottom-modal">
+                <div class="modal-icon icon-error"><ion-icon name="alert-circle-outline"></ion-icon></div>
+                <h3 style="text-align: center; margin-bottom: 10px;">Insufficient Balance</h3>
+                <p style="text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.5;">
+                    You do not have enough funds in your account to complete this transaction.
+                </p>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="closePayment()">Okay, Got it</button>
+            </div>
+
+            <!-- User Profile Modal (Mobile - Bottom Sheet) -->
+            <div id="profile-modal" class="bottom-modal">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background-image: url('https://i.pravatar.cc/150?img=12'); background-size: cover; margin: 0 auto 15px; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1);"></div>
+                    <h2 style="margin-bottom: 5px;">Rahul Sharma</h2>
+                    <span class="badge badge-safe">KYC Verified</span>
+                </div>
+                
+                <div class="profile-row">
+                    <span class="profile-label">PRISM ID</span>
+                    <span class="profile-val">rahul@prism</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Phone Number</span>
+                    <span class="profile-val">+91 98765 43210</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Email</span>
+                    <span class="profile-val">rahul.sharma@test.com</span>
+                </div>
+                <div class="profile-row" style="border-bottom: none;">
+                    <span class="profile-label">Account Type</span>
+                    <span class="profile-val">Savings (Tier 1)</span>
+                </div>
+
+                <button class="btn btn-ghost" style="width: 100%; margin-top: 20px;" onclick="closeProfileModal()">Close Profile</button>
+            </div>
+
+
+            <!-- Success Screen -->
+            <div id="success-screen" class="success-screen">
+                <div style="width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 3rem; margin-bottom: 20px;">
+                    <ion-icon name="checkmark"></ion-icon>
+                </div>
+                <h2>Payment Successful</h2>
+                <p style="opacity: 0.8; margin-top: 10px;">Transaction ID: <span id="success-tid">#8821</span></p>
+                <h1 style="margin-top: 20px;" id="success-amount">₹ 0</h1>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ==========================
+         VIEW 3: DESKTOP DASHBOARD
+    ========================== -->
+    <section id="desktop-view" class="view-section">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-box" style="width: 40px; height: 40px; font-size: 1.2rem; margin-bottom: 40px;" data-tooltip-pos="right" data-tooltip="PRISM Admin"><ion-icon name="prism"></ion-icon></div>
+            
+            <div class="nav-icon active" id="nav-analytics" onclick="switchDesktopTab('d-tab-analytics')" data-tooltip-pos="right" data-tooltip="Analytics Dashboard">
+                <ion-icon name="analytics-outline"></ion-icon>
+            </div>
+            
+            <div class="nav-icon" id="nav-users" onclick="switchDesktopTab('d-tab-users')" data-tooltip-pos="right" data-tooltip="User Network">
+                <ion-icon name="people-outline"></ion-icon>
+            </div>
+            
+            <div class="nav-icon" id="nav-rules" onclick="switchDesktopTab('d-tab-rules')" data-tooltip-pos="right" data-tooltip="Detection Rules">
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+            </div>
+            
+            <div class="nav-icon" style="margin-top: auto;" onclick="handleLogout()" title="Log Out" data-tooltip-pos="right" data-tooltip="Sign Out">
+                <ion-icon name="log-out-outline"></ion-icon>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="dashboard-main">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>Surveillance Dashboard</h1>
+                    <p style="color: var(--text-secondary);">Real-time payment integrity monitoring • <span style="color: var(--success); font-weight: 600;">● System Active</span></p>
+                </div>
+                <!-- Interactive Admin Avatar -->
+                <div class="avatar" style="background-image: url('https://i.pravatar.cc/150?img=68'); width: 40px; height: 40px; cursor: pointer;" onclick="openAdminProfile()" data-tooltip="View Profile"></div>
+            </div>
+
+            <!-- Tab 1: Analytics (Default) -->
+            <div id="d-tab-analytics" class="d-tab-content active">
+                <!-- Top Metrics -->
+                <div class="stats-grid">
+                    <div class="stat-card" data-tooltip="Total processed volume">
+                        <div class="stat-val">₹ 42.5L</div>
+                        <div class="stat-label">Total Volume (24h)</div>
+                    </div>
+                    <div class="stat-card" data-tooltip="Total transaction count">
+                        <div class="stat-val">1,204</div>
+                        <div class="stat-label">Transactions</div>
+                    </div>
+                    <div class="stat-card" data-tooltip="Percentage of flagged transactions">
+                        <div class="stat-val" style="color: var(--danger);">3.2%</div>
+                        <div class="stat-label">Risk Flag Rate</div>
+                    </div>
+                    <div class="stat-card" data-tooltip="Alerts requiring attention">
+                        <div class="stat-val">12</div>
+                        <div class="stat-label">Active Alerts</div>
+                    </div>
+                </div>
+
+                <!-- Split View -->
+                <div class="content-split">
+                    <!-- Live Feed -->
+                    <div class="live-feed-card">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                            <h3>Live Transaction Feed</h3>
+                            <button class="btn-ghost" style="font-size: 0.9rem;" data-tooltip="Filter Risk Levels"><ion-icon name="filter"></ion-icon> Filter</button>
+                        </div>
+                        <div class="table-header">
+                            <span>TXN ID</span>
+                            <span>PARTICIPANTS</span>
+                            <span>AMOUNT</span>
+                            <span>RISK SCORE</span>
+                        </div>
+                        <div class="feed-scroll" id="admin-feed">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Risk Geo Viz -->
+                    <div class="risk-map-card">
+                        <h3>Risk Origin Map</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Geographic distribution of flagged payments</p>
                         
-                        <!-- Hotspot markers -->
-                        <circle cx="250" cy="200" r="20" fill="rgba(255, 77, 109, 0.2)">
-                            <animate attributeName="r" values="15;25;15" dur="3s" repeatCount="indefinite"/>
-                            <animate attributeName="opacity" values="0.4;0.2;0.4" dur="3s" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="450" cy="180" r="18" fill="rgba(255, 77, 109, 0.15)">
-                            <animate attributeName="r" values="13;23;13" dur="4s" repeatCount="indefinite"/>
-                            <animate attributeName="opacity" values="0.3;0.15;0.3" dur="4s" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="580" cy="210" r="15" fill="rgba(255, 77, 109, 0.2)">
-                            <animate attributeName="r" values="10;20;10" dur="3.5s" repeatCount="indefinite"/>
-                            <animate attributeName="opacity" values="0.4;0.2;0.4" dur="3.5s" repeatCount="indefinite"/>
-                        </circle>
-                    </svg>
-                </div>
+                        <div style="flex: 1; display: flex; align-items: center; justify-content: center; opacity: 0.1; font-size: 5rem;">
+                            <ion-icon name="map"></ion-icon>
+                        </div>
 
-                <div class="content-wrapper">
-                    <!-- Page Header -->
-                    <div class="page-header">
-                        <h1 class="page-title">Fraud Detection Dashboard</h1>
-                        <div class="header-actions">
-                            <div class="btn-icon" title="Refresh">
-                                <i class="fas fa-sync-alt"></i>
+                        <div class="region-list">
+                            <div class="region-bar">
+                                <span style="width: 50px;">North</span>
+                                <div class="progress-bg"><div class="progress-fill" style="width: 75%; background: var(--danger);"></div></div>
+                                <span style="font-weight: 700;">75%</span>
                             </div>
-                            <div class="btn-icon" title="Download">
-                                <i class="fas fa-download"></i>
+                            <div class="region-bar">
+                                <span style="width: 50px;">West</span>
+                                <div class="progress-bg"><div class="progress-fill" style="width: 40%; background: var(--warning);"></div></div>
+                                <span style="font-weight: 700;">40%</span>
                             </div>
-                            <div class="btn-icon" title="Settings">
-                                <i class="fas fa-cog"></i>
+                            <div class="region-bar">
+                                <span style="width: 50px;">South</span>
+                                <div class="progress-bg"><div class="progress-fill" style="width: 15%; background: var(--success);"></div></div>
+                                <span style="font-weight: 700;">15%</span>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Grid Layout -->
-                    <div class="grid-layout">
-                        <!-- Overview Card -->
-                        <div class="card overview-card">
-                            <div class="card-title">Overview</div>
-                            <div class="overview-grid">
-                                <div class="stat-item">
-                                    <div class="stat-value">
-                                        13.7K
-                                        <span class="stat-change positive">↑ 8.4%</span>
-                                    </div>
-                                    <div class="stat-label">Total Transactions</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value">
-                                        98.6K
-                                        <span class="stat-change positive">↑ 14.8%</span>
-                                    </div>
-                                    <div class="stat-label">Scans Performed</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value">
-                                        312%
-                                        <span class="stat-change negative">↑ 10.2%</span>
-                                    </div>
-                                    <div class="stat-label">Fraud Detection Rate</div>
-                                </div>
-                            </div>
+            <!-- Tab 2: Users Network -->
+            <div id="d-tab-users" class="d-tab-content">
+                <div class="live-feed-card" style="height: 100%;">
+                    <h3>User Network Analysis</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Database of flagged and monitored entities.</p>
+                    <div class="table-header">
+                        <span>ENTITY NAME</span>
+                        <span>ACCOUNT ID</span>
+                        <span>RISK TIER</span>
+                        <span>STATUS</span>
+                    </div>
+                    <div class="feed-scroll">
+                         <div class="feed-row">
+                            <span><ion-icon name="business" style="vertical-align: middle;"></ion-icon> Crypto Hub</span>
+                            <span style="font-family: monospace;">#ACC-9912</span>
+                            <span style="color: var(--danger); font-weight:700;">Critical</span>
+                            <span class="badge badge-risk">Watchlist</span>
                         </div>
-
-                        <!-- Flagged Transactions -->
-                        <div class="card metric-card" style="color: var(--danger);">
-                            <div class="card-header">
-                                <div class="card-title">Flagged Transactions</div>
-                                <div class="card-icon">
-                                    <i class="fas fa-arrow-trend-up"></i>
-                                </div>
-                            </div>
-                            <div class="metric-value">
-                                3,209
-                                <span class="metric-trend" style="color: var(--danger);">↑ 10.2%</span>
-                            </div>
-                            <svg class="mini-chart" viewBox="0 0 200 60">
-                                <path class="chart-area" d="M 0 60 L 0 40 Q 25 35 50 30 T 100 25 Q 125 20 150 15 L 200 10 L 200 60 Z"/>
-                                <path class="chart-line" d="M 0 40 Q 25 35 50 30 T 100 25 Q 125 20 150 15 L 200 10"/>
-                            </svg>
+                        <div class="feed-row">
+                            <span>Rahul Sharma</span>
+                            <span style="font-family: monospace;">#ACC-8821</span>
+                            <span style="color: var(--text-primary); font-weight:700;">Low</span>
+                            <span class="badge badge-safe">Verified</span>
                         </div>
-
-                        <!-- Verified Safe -->
-                        <div class="card metric-card" style="color: var(--success);">
-                            <div class="card-header">
-                                <div class="card-title">Verified Safe</div>
-                                <div class="card-icon">
-                                    <i class="fas fa-arrow-trend-up"></i>
-                                </div>
-                            </div>
-                            <div class="metric-value">
-                                2,956
-                                <span class="metric-trend" style="color: var(--success);">↑ 10.1%</span>
-                            </div>
-                            <svg class="mini-chart" viewBox="0 0 200 60">
-                                <path class="chart-area" d="M 0 60 L 0 30 Q 25 32 50 35 T 100 40 Q 125 42 150 45 L 200 50 L 200 60 Z"/>
-                                <path class="chart-line" d="M 0 30 Q 25 32 50 35 T 100 40 Q 125 42 150 45 L 200 50"/>
-                            </svg>
+                        <div class="feed-row">
+                            <span>Bot_Network_01</span>
+                            <span style="font-family: monospace;">#ACC-0000</span>
+                            <span style="color: var(--danger); font-weight:700;">High</span>
+                            <span class="badge badge-risk">Blocked</span>
                         </div>
-
-                        <!-- Map Card with Country Stats -->
-                        <div class="card map-card">
-                            <div class="world-map">
-                                <svg width="100%" height="100%" viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.3;">
-                                    <!-- India highlighted -->
-                                    <path d="M 650 180 L 680 190 L 690 210 L 680 230 L 660 240 L 640 235 L 630 220 L 635 200 Z" 
-                                          fill="rgba(255, 77, 109, 0.4)" stroke="rgba(255, 77, 109, 0.6)" stroke-width="1"/>
-                                    
-                                    <!-- Nigeria -->
-                                    <path d="M 450 220 L 470 215 L 480 225 L 475 240 L 460 245 L 445 235 Z" 
-                                          fill="rgba(255, 77, 109, 0.3)" stroke="rgba(255, 77, 109, 0.5)" stroke-width="1"/>
-                                    
-                                    <!-- China -->
-                                    <path d="M 720 140 L 760 135 L 780 150 L 770 170 L 740 175 L 715 165 Z" 
-                                          fill="rgba(255, 77, 109, 0.25)" stroke="rgba(255, 77, 109, 0.4)" stroke-width="1"/>
-                                    
-                                    <!-- USA -->
-                                    <path d="M 180 140 L 240 130 L 280 140 L 290 160 L 270 180 L 230 185 L 190 175 Z" 
-                                          fill="rgba(255, 77, 109, 0.2)" stroke="rgba(255, 77, 109, 0.3)" stroke-width="1"/>
-                                    
-                                    <!-- Scam hotspot markers -->
-                                    <g>
-                                        <circle cx="665" cy="215" r="8" fill="var(--danger)" opacity="0.8"/>
-                                        <circle cx="665" cy="215" r="15" fill="none" stroke="var(--danger)" stroke-width="2" opacity="0.4">
-                                            <animate attributeName="r" values="15;25;15" dur="2s" repeatCount="indefinite"/>
-                                            <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite"/>
-                                        </circle>
-                                    </g>
-                                    
-                                    <g>
-                                        <circle cx="465" cy="232" r="6" fill="var(--danger)" opacity="0.7"/>
-                                        <circle cx="465" cy="232" r="12" fill="none" stroke="var(--danger)" stroke-width="2" opacity="0.3">
-                                            <animate attributeName="r" values="12;20;12" dur="2.5s" repeatCount="indefinite"/>
-                                            <animate attributeName="opacity" values="0.3;0;0.3" dur="2.5s" repeatCount="indefinite"/>
-                                        </circle>
-                                    </g>
-                                </svg>
-                                
-                                <div class="map-overlay">
-                                    <div class="overlay-title">Key Scam Hotspots</div>
-                                    <div class="overlay-value">1,248 <span style="font-size: 16px; color: var(--text-secondary);">Total Regions</span></div>
-                                    
-                                    <div class="country-list">
-                                        <div class="country-item">
-                                            <div class="country-name">India</div>
-                                            <div class="country-bar">
-                                                <div class="bar-fill" style="width: 45%;"></div>
-                                            </div>
-                                            <div class="country-percent">45%</div>
-                                        </div>
-                                        <div class="country-item">
-                                            <div class="country-name">Nigeria</div>
-                                            <div class="country-bar">
-                                                <div class="bar-fill" style="width: 23%;"></div>
-                                            </div>
-                                            <div class="country-percent">23%</div>
-                                        </div>
-                                        <div class="country-item">
-                                            <div class="country-name">China</div>
-                                            <div class="country-bar">
-                                                <div class="bar-fill" style="width: 19%;"></div>
-                                            </div>
-                                            <div class="country-percent">19%</div>
-                                        </div>
-                                        <div class="country-item">
-                                            <div class="country-name">Others</div>
-                                            <div class="country-bar">
-                                                <div class="bar-fill" style="width: 13%;"></div>
-                                            </div>
-                                            <div class="country-percent">13%</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Transaction Table -->
-                        <div class="card table-card">
-                            <div class="table-header">
-                                <div class="card-title">Recent Transactions</div>
-                                <div style="display: flex; gap: 16px; align-items: center;">
-                                    <div class="table-tabs">
-                                        <button class="tab-btn active">All</button>
-                                        <button class="tab-btn">Daily</button>
-                                        <button class="tab-btn">Weekly</button>
-                                        <button class="tab-btn">Monthly</button>
-                                    </div>
-                                    
-                                    <div class="detection-mode">
-                                        <span class="mode-label">Detection Mode:</span>
-                                        <select class="mode-select" id="detectionMode">
-                                            <option value="rule">Rule-Based</option>
-                                            <option value="ml">ML-Based</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Transaction ID</th>
-                                        <th>Sender</th>
-                                        <th>Receiver</th>
-                                        <th>Amount</th>
-                                        <th>Risk Level</th>
-                                        <th>Time</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="transactionTable">
-                                    <tr>
-                                        <td><span style="font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);">#TXN-8734</span></td>
-                                        <td>user_1847</td>
-                                        <td>receiver_2983</td>
-                                        <td class="amount">₹16,810</td>
-                                        <td>
-                                            <span class="status-badge high">
-                                                <span class="status-dot"></span>
-                                                High Risk
-                                            </span>
-                                        </td>
-                                        <td>2 min ago</td>
-                                        <td><button class="action-btn">View</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span style="font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);">#TXN-8733</span></td>
-                                        <td>user_1523</td>
-                                        <td>receiver_8471</td>
-                                        <td class="amount">₹15,032</td>
-                                        <td>
-                                            <span class="status-badge medium">
-                                                <span class="status-dot"></span>
-                                                Medium Risk
-                                            </span>
-                                        </td>
-                                        <td>5 min ago</td>
-                                        <td><button class="action-btn">View</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span style="font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);">#TXN-8732</span></td>
-                                        <td>user_2947</td>
-                                        <td>receiver_5623</td>
-                                        <td class="amount">₹15,012</td>
-                                        <td>
-                                            <span class="status-badge low">
-                                                <span class="status-dot"></span>
-                                                Low Risk
-                                            </span>
-                                        </td>
-                                        <td>8 min ago</td>
-                                        <td><button class="action-btn">View</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span style="font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);">#TXN-8731</span></td>
-                                        <td>user_3891</td>
-                                        <td>receiver_1247</td>
-                                        <td class="amount">₹13,235</td>
-                                        <td>
-                                            <span class="status-badge high">
-                                                <span class="status-dot"></span>
-                                                High Risk
-                                            </span>
-                                        </td>
-                                        <td>12 min ago</td>
-                                        <td><button class="action-btn">View</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><span style="font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);">#TXN-8730</span></td>
-                                        <td>user_5624</td>
-                                        <td>receiver_7893</td>
-                                        <td class="amount">₹12,095</td>
-                                        <td>
-                                            <span class="status-badge low">
-                                                <span class="status-dot"></span>
-                                                Low Risk
-                                            </span>
-                                        </td>
-                                        <td>18 min ago</td>
-                                        <td><button class="action-btn">View</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Upgrade Banner -->
-                        <div class="card upgrade-banner">
-                            <div class="banner-text">Upgrade to access advanced fraud detection analytics and real-time alerts</div>
-                            <button class="btn-upgrade">Get Pro</button>
+                         <div class="feed-row">
+                            <span>Anita Roy</span>
+                            <span style="font-family: monospace;">#ACC-1234</span>
+                            <span style="color: var(--text-primary); font-weight:700;">Low</span>
+                            <span class="badge badge-safe">Verified</span>
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
+
+             <!-- Tab 3: Security Rules -->
+             <div id="d-tab-rules" class="d-tab-content">
+                <div class="live-feed-card" style="height: 100%;">
+                    <h3>Detection Rules Configuration</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Active algorithms monitoring payment integrity.</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div class="card" style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee;">
+                            <div>
+                                <h4>Velocity Check (High Frequency)</h4>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary);">Flags >5 transactions in 1 hour from same device.</p>
+                            </div>
+                            <span class="badge badge-safe">Active</span>
+                        </div>
+
+                        <div class="card" style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee;">
+                            <div>
+                                <h4>Geo-Fencing Anomaly</h4>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary);">Flags logins from distances >500km within 10 mins.</p>
+                            </div>
+                            <span class="badge badge-safe">Active</span>
+                        </div>
+
+                        <div class="card" style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee;">
+                            <div>
+                                <h4>Large Amount Threshold</h4>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary);">Flags any single transaction > ₹1,00,000.</p>
+                            </div>
+                            <span class="badge badge-warning">Testing</span>
+                        </div>
+
+                        <div class="card" style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee;">
+                            <div>
+                                <h4>Blacklist Cross-Reference</h4>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary);">Checks receiver against global sanctions list.</p>
+                            </div>
+                            <span class="badge badge-safe">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
+
+        <!-- Admin Inspection Modal (Existing) -->
+        <div id="admin-modal" class="admin-modal-overlay" onclick="closeAdminModal(event)">
+            <div class="detail-box">
+                <h3 style="margin-bottom: 20px;">Transaction Details</h3>
+                <div class="detail-row"><span class="detail-label">ID</span><span class="detail-val" id="modal-id">#TXN-8821</span></div>
+                <div class="detail-row"><span class="detail-label">Time</span><span class="detail-val">10:42:05 AM</span></div>
+                <div class="detail-row"><span class="detail-label">Sender</span><span class="detail-val">Rahul S.</span></div>
+                <div class="detail-row"><span class="detail-label">Receiver</span><span class="detail-val">Crypto Hub</span></div>
+                <div class="detail-row"><span class="detail-label">Amount</span><span class="detail-val" id="modal-amt">₹ 50,000</span></div>
+                <div class="detail-row"><span class="detail-label">Device</span><span class="detail-val">Android 13 / Pixel</span></div>
+                <div class="detail-row"><span class="detail-label">Status</span><span class="badge badge-risk">High Risk</span></div>
+                <div style="margin-top: 20px; padding: 10px; background: #f8f9fc; border-radius: 8px; font-size: 0.8rem; color: var(--text-secondary);">
+                    <strong>Risk Logic:</strong> Velocity check failed. Sender has made 5 high-value transfers in 1 hour.
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeAdminModal(null)">Close Inspection</button>
+            </div>
+        </div>
+
+        <!-- Admin Profile Modal (NEW) -->
+        <div id="admin-profile-modal" class="admin-modal-overlay" onclick="closeAdminProfile(event)">
+            <div class="detail-box" style="text-align: center;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background-image: url('https://i.pravatar.cc/150?img=68'); background-size: cover; margin: 0 auto 15px; border: 3px solid var(--accent-orange);"></div>
+                <h2 style="margin-bottom: 5px;">System Administrator</h2>
+                <span class="badge badge-safe">Super Admin</span>
+                
+                <div style="margin-top: 20px; text-align: left;">
+                    <div class="detail-row"><span class="detail-label">Prism ID</span><span class="detail-val">#ADM-001</span></div>
+                    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-val">admin@prism.com</span></div>
+                    <div class="detail-row"><span class="detail-label">Department</span><span class="detail-val">Security Ops</span></div>
+                    <div class="detail-row"><span class="detail-label">Clearance</span><span class="detail-val">Level 5</span></div>
+                    <div class="detail-row" style="border-bottom: none;"><span class="detail-label">Last Login</span><span class="detail-val">Today, 09:15 AM</span></div>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeAdminProfile(null)">Close Profile</button>
+            </div>
+        </div>
+    </section>
 
     <script>
-        // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing...');
+        // ==========================
+        // SHARED STATE
+        // ==========================
+        const state = {
+            role: null, // 'user' or 'admin'
+            balance: 24500,
+            payee: null,
+            contacts: [
+                { id: 1, name: "Anita Roy", phone: "+91 98765 43210", img: "44" },
+                { id: 2, name: "Grocery Store", phone: "+91 88888 22222", img: "33" },
+                { id: 3, name: "Ravi Kumar", phone: "+91 77777 11111", img: "11" },
+                { id: 4, name: "Gym Fees", phone: "+91 66666 00000", img: "55" },
+                { id: 5, name: "Crypto Hub", phone: "Unknown", img: "60" } // Risky payee
+            ],
+            recents: [1, 2, 3],
+            history: [
+                { title: "Gym Fees", date: "Today, 10:00 AM", amount: "- ₹ 1,500", type: "debit" },
+                { title: "Salary", date: "Yesterday", amount: "+ ₹ 45,000", type: "credit" },
+                { title: "Grocery Store", date: "2 Oct 2023", amount: "- ₹ 2,340", type: "debit" }
+            ],
+            transactions: [] // For Admin feed
+        };
+
+        // ==========================
+        // 1. AUTH LOGIC
+        // ==========================
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
             
-            // Login functionality
-            const loginForm = document.getElementById('loginForm');
-            const loginScreen = document.getElementById('loginScreen');
-            const dashboardScreen = document.getElementById('dashboardScreen');
-            const roleOptions = document.querySelectorAll('.role-option');
+            // Switch Views based on email
+            document.getElementById('auth-view').classList.remove('active');
             
-            let selectedRole = 'admin';
-            let detectionMode = 'rule'; // default detection mode
-            let currentView = 'dashboard';
+            if (email === 'admin@prism.com') {
+                state.role = 'admin';
+                document.getElementById('desktop-view').classList.add('active');
+                initAdminDashboard();
+            } else {
+                state.role = 'user';
+                document.getElementById('mobile-view').classList.add('active');
+                initMobileApp();
+            }
+        }
 
-            // Role selection
-            roleOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    roleOptions.forEach(opt => opt.classList.remove('active'));
-                    option.classList.add('active');
-                    selectedRole = option.dataset.role;
-                    console.log('Role selected:', selectedRole);
-                });
-            });
+        function handleLogout() {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('auth-view').classList.add('active');
+            const passField = document.querySelector('input[type="password"]');
+            if(passField) passField.value = '';
+            state.role = null;
+            // Reset Tabs
+            switchDesktopTab('d-tab-analytics');
+            switchMobileContent('m-home');
+        }
 
-            // Login submit
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                console.log('Form submitted! Selected role:', selectedRole);
-                
-                const email = loginForm.querySelector('input[type="email"]').value;
-                const password = loginForm.querySelector('input[type="password"]').value;
-                
-                if (!email || !password) {
-                    alert('Please enter both email and password');
-                    return;
-                }
-                
-                if (selectedRole === 'admin') {
-                    loginScreen.style.display = 'none';
-                    dashboardScreen.classList.add('active');
-                    console.log('Dashboard should now be visible!');
-                    startRealTimeUpdates();
-                } else {
-                    alert('User payment interface coming soon!');
-                }
-            });
+        // ==========================
+        // 2. MOBILE APP LOGIC
+        // ==========================
+        function initMobileApp() {
+            renderContacts();
+            renderRecents();
+            renderHistory();
+            updateBalanceUI();
+        }
 
-            // Theme Toggle
-            const themeToggle = document.querySelector('.theme-toggle');
-            let isDarkMode = true;
-            themeToggle.addEventListener('click', () => {
-                isDarkMode = !isDarkMode;
-                themeToggle.querySelector('i').className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
-                document.body.style.transition = 'all 0.3s ease';
-                if (!isDarkMode) {
-                    document.documentElement.style.setProperty('--bg-dark', '#f5f5f5');
-                    document.documentElement.style.setProperty('--bg-darker', '#ffffff');
-                    document.documentElement.style.setProperty('--text-primary', '#1a1a1a');
-                    document.documentElement.style.setProperty('--text-secondary', '#666666');
-                } else {
-                    document.documentElement.style.setProperty('--bg-dark', '#1a1a1a');
-                    document.documentElement.style.setProperty('--bg-darker', '#0f0f0f');
-                    document.documentElement.style.setProperty('--text-primary', '#ffffff');
-                    document.documentElement.style.setProperty('--text-secondary', '#b0b0b0');
-                }
-            });
+        // --- View Switching Logic ---
+        function switchMobileContent(viewId) {
+            document.querySelectorAll('.m-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
 
-            // Notification Bell
-            const notificationBtn = document.querySelector('.notification-btn');
-            notificationBtn.addEventListener('click', () => {
-                const notifications = [
-                    'High-risk transaction detected from India (+₹45,000)',
-                    'New scam pattern identified in Nigeria region',
-                    '15 accounts flagged in the last hour',
-                    'Weekly fraud report is ready for download',
-                    'ML model accuracy improved to 94.2%'
-                ];
-                
-                const notifHtml = `
-                    <div style="position: fixed; top: 80px; right: 40px; background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px; width: 320px; z-index: 1000; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <h3 style="font-size: 16px; font-weight: 600;">Notifications</h3>
-                            <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 20px;">&times;</button>
-                        </div>
-                        ${notifications.map((notif, i) => `
-                            <div style="padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 8px; font-size: 13px; border-left: 3px solid ${i === 0 ? 'var(--danger)' : 'var(--text-muted)'};">
-                                <div style="margin-bottom: 4px;">${notif}</div>
-                                <div style="color: var(--text-muted); font-size: 11px;">${i === 0 ? 'Just now' : i + ' min ago'}</div>
-                            </div>
-                        `).join('')}
+        function updateBalanceUI() {
+            document.getElementById('wallet-balance').innerText = `₹ ${state.balance.toLocaleString()}`;
+            document.getElementById('bal-hint').innerText = `Available: ₹ ${state.balance.toLocaleString()}`;
+        }
+
+        function renderContacts() {
+            const list = document.getElementById('contact-list');
+            const sendList = document.getElementById('send-contact-list');
+            const html = state.contacts.map(c => `
+                <div class="contact-row" onclick="startPayment('${c.name}')" data-tooltip="Tap to Pay">
+                    <div class="avatar" style="background-image: url('https://i.pravatar.cc/150?img=${c.img}')"></div>
+                    <div class="contact-info">
+                        <h4>${c.name}</h4>
+                        <p>${c.phone}</p>
                     </div>
-                `;
-                
-                // Remove existing notification panel if any
-                const existing = document.querySelector('[style*="position: fixed"][style*="top: 80px"]');
-                if (existing) {
-                    existing.remove();
-                } else {
-                    document.body.insertAdjacentHTML('beforeend', notifHtml);
-                }
-            });
-
-            // User Avatar - Logout
-            const userAvatar = document.querySelector('.user-avatar');
-            userAvatar.addEventListener('click', () => {
-                const confirmLogout = confirm('Are you sure you want to logout?');
-                if (confirmLogout) {
-                    dashboardScreen.classList.remove('active');
-                    loginScreen.style.display = 'flex';
-                    // Reset to default theme
-                    if (!isDarkMode) themeToggle.click();
-                }
-            });
-
-            // Sidebar Navigation
-            const sidebarItems = document.querySelectorAll('.sidebar-item');
-            const views = ['dashboard', 'users', 'transactions', 'reports', 'payments', 'analytics', 'settings'];
+                </div>
+            `).join('');
             
-            sidebarItems.forEach((item, index) => {
-                item.addEventListener('click', () => {
-                    sidebarItems.forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                    currentView = views[index];
-                    updateView(views[index]);
-                });
-            });
+            list.innerHTML = html;
+            if(sendList) sendList.innerHTML = html;
+        }
 
-            function updateView(view) {
-                const contentWrapper = document.querySelector('.content-wrapper');
-                const pageTitle = document.querySelector('.page-title');
-                
-                switch(view) {
-                    case 'dashboard':
-                        pageTitle.textContent = 'Fraud Detection Dashboard';
-                        // Dashboard is the default view - already loaded
-                        break;
-                    case 'users':
-                        pageTitle.textContent = 'User Management';
-                        showNotification('User Management view - Coming soon with full user database');
-                        break;
-                    case 'transactions':
-                        pageTitle.textContent = 'All Transactions';
-                        showNotification('Full transaction history view loading...');
-                        break;
-                    case 'reports':
-                        pageTitle.textContent = 'Reports & Analytics';
-                        showNotification('Generating comprehensive fraud reports...');
-                        break;
-                    case 'payments':
-                        pageTitle.textContent = 'Payment Tracking';
-                        showNotification('Payment monitoring system loading...');
-                        break;
-                    case 'analytics':
-                        pageTitle.textContent = 'Advanced Analytics';
-                        showNotification('Advanced analytics dashboard loading...');
-                        break;
-                    case 'settings':
-                        pageTitle.textContent = 'System Settings';
-                        showNotification('Settings panel - Configure detection parameters');
-                        break;
-                }
-            }
+        function renderRecents() {
+            const list = document.getElementById('recent-list');
+            const recentContacts = state.contacts.filter(c => state.recents.includes(c.id));
+            list.innerHTML = recentContacts.map(c => `
+                <div class="recent-item" onclick="startPayment('${c.name}')" data-tooltip="Quick Pay">
+                    <div class="avatar" style="background-image: url('https://i.pravatar.cc/150?img=${c.img}')"></div>
+                    <span style="font-size: 0.75rem;">${c.name.split(' ')[0]}</span>
+                </div>
+            `).join('');
+        }
 
-            function showNotification(message) {
-                const notif = document.createElement('div');
-                notif.style.cssText = `
-                    position: fixed;
-                    top: 100px;
-                    right: 40px;
-                    background: linear-gradient(135deg, rgba(255, 77, 109, 0.9) 0%, rgba(255, 107, 138, 0.9) 100%);
-                    color: white;
-                    padding: 16px 24px;
-                    border-radius: 12px;
-                    box-shadow: 0 10px 40px rgba(255, 77, 109, 0.3);
-                    z-index: 10000;
-                    font-size: 14px;
-                    font-weight: 500;
-                    animation: slideIn 0.3s ease;
-                `;
-                notif.textContent = message;
-                document.body.appendChild(notif);
-                
-                setTimeout(() => {
-                    notif.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => notif.remove(), 300);
-                }, 3000);
-            }
-
-            // Header Action Buttons
-            const refreshBtn = document.querySelector('[title="Refresh"]');
-            const downloadBtn = document.querySelector('[title="Download"]');
-            const settingsBtn = document.querySelector('[title="Settings"]');
-
-            refreshBtn.addEventListener('click', () => {
-                refreshBtn.querySelector('i').style.animation = 'spin 1s ease';
-                setTimeout(() => {
-                    refreshBtn.querySelector('i').style.animation = '';
-                }, 1000);
-                
-                // Simulate data refresh
-                updateTransactionTable();
-                updateMetrics();
-                showNotification('Data refreshed successfully!');
-            });
-
-            downloadBtn.addEventListener('click', () => {
-                const csvContent = generateCSVReport();
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `fraud-report-${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-                showNotification('Report downloaded successfully!');
-            });
-
-            settingsBtn.addEventListener('click', () => {
-                sidebarItems[6].click(); // Navigate to settings
-            });
-
-            // Detection Mode Change
-            const detectionModeSelect = document.getElementById('detectionMode');
-            if (detectionModeSelect) {
-                detectionModeSelect.addEventListener('change', (e) => {
-                    detectionMode = e.target.value;
-                    console.log('Detection mode changed to:', detectionMode);
-                    
-                    if (detectionMode === 'ml') {
-                        showNotification('Switched to ML-Based detection - Using neural network model');
-                    } else {
-                        showNotification('Switched to Rule-Based detection - Using predefined parameters');
-                    }
-                    
-                    // Update transaction risk levels based on new mode
-                    updateTransactionTable();
-                });
-            }
-
-            // Tab switching with actual filtering
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    const filter = btn.textContent.toLowerCase();
-                    console.log('Filtering transactions by:', filter);
-                    filterTransactions(filter);
-                });
-            });
-
-            function filterTransactions(filter) {
-                // This would filter the transaction table based on the selected time period
-                showNotification(`Showing ${filter} transactions`);
-                updateTransactionTable();
-            }
-
-            // Action buttons in table
-            function setupTableActionButtons() {
-                const actionBtns = document.querySelectorAll('.action-btn');
-                actionBtns.forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const row = e.target.closest('tr');
-                        const txnId = row.cells[0].textContent;
-                        const sender = row.cells[1].textContent;
-                        const receiver = row.cells[2].textContent;
-                        const amount = row.cells[3].textContent;
-                        const risk = row.cells[4].textContent.trim();
-                        
-                        showTransactionDetails(txnId, sender, receiver, amount, risk);
-                    });
-                });
-            }
-
-            function showTransactionDetails(txnId, sender, receiver, amount, risk) {
-                const detailsHtml = `
-                    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;" onclick="this.remove()">
-                        <div style="background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 32px; width: 500px; max-height: 80vh; overflow-y: auto;" onclick="event.stopPropagation()">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                                <h2 style="font-size: 24px; font-weight: 600;">Transaction Details</h2>
-                                <button onclick="this.closest('[style*=fixed]').remove()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 24px;">&times;</button>
-                            </div>
-                            
-                            <div style="margin-bottom: 20px;">
-                                <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 4px;">Transaction ID</div>
-                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 16px;">${txnId}</div>
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                                <div>
-                                    <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 4px;">Sender</div>
-                                    <div style="font-size: 15px;">${sender}</div>
-                                </div>
-                                <div>
-                                    <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 4px;">Receiver</div>
-                                    <div style="font-size: 15px;">${receiver}</div>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 20px;">
-                                <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 4px;">Amount</div>
-                                <div style="font-size: 24px; font-weight: 700; font-family: 'JetBrains Mono', monospace;">${amount}</div>
-                            </div>
-                            
-                            <div style="margin-bottom: 24px;">
-                                <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">Risk Assessment</div>
-                                <div style="padding: 12px; background: ${risk.includes('High') ? 'rgba(255, 77, 109, 0.1)' : risk.includes('Medium') ? 'rgba(255, 194, 51, 0.1)' : 'rgba(6, 214, 160, 0.1)'}; border-radius: 8px; border: 1px solid ${risk.includes('High') ? 'rgba(255, 77, 109, 0.3)' : risk.includes('Medium') ? 'rgba(255, 194, 51, 0.3)' : 'rgba(6, 214, 160, 0.3)'};">
-                                    ${risk}
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 24px;">
-                                <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 8px;">Risk Factors</div>
-                                <div style="font-size: 13px; line-height: 1.6;">
-                                    ${risk.includes('High') ? 
-                                        '• Receiver account is newly created (3 days old)<br>• Multiple similar transactions detected<br>• Location frequently changes<br>• High-risk region (India)' :
-                                        risk.includes('Medium') ?
-                                        '• Receiver has moderate transaction history<br>• Amount slightly above average<br>• Normal location pattern' :
-                                        '• Verified receiver account<br>• Normal transaction pattern<br>• Trusted location'}
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 12px;">
-                                <button onclick="alert('Transaction flagged for review'); this.closest('[style*=fixed]').remove();" style="flex: 1; padding: 12px; background: var(--danger); border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer;">Flag as Fraud</button>
-                                <button onclick="alert('Transaction marked as safe'); this.closest('[style*=fixed]').remove();" style="flex: 1; padding: 12px; background: var(--success); border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer;">Mark as Safe</button>
-                            </div>
+        function renderHistory() {
+             const list = document.getElementById('m-hist-list');
+             list.innerHTML = state.history.map(h => `
+                <div class="contact-row" style="justify-content: space-between;">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div style="width: 40px; height: 40px; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+                             <ion-icon name="${h.type === 'credit' ? 'arrow-down' : 'arrow-up'}"></ion-icon>
+                        </div>
+                        <div>
+                            <h4>${h.title}</h4>
+                            <p>${h.date}</p>
                         </div>
                     </div>
-                `;
-                
-                document.body.insertAdjacentHTML('beforeend', detailsHtml);
+                    <div style="font-weight: 700; color: ${h.type === 'credit' ? 'var(--success)' : 'var(--text-primary)'};">${h.amount}</div>
+                </div>
+             `).join('');
+        }
+
+        function startPayment(name) {
+            state.payee = name;
+            document.getElementById('payee-name').innerText = name;
+            document.getElementById('amount-input').value = '';
+            document.getElementById('payment-overlay').classList.add('active');
+        }
+        
+        function checkBalance() {
+            const amt = parseInt(document.getElementById('amount-input').value) || 0;
+            const hint = document.getElementById('bal-hint');
+            if (amt > state.balance) {
+                hint.style.color = 'var(--danger)';
+                hint.innerText = `Insufficient funds (Available: ₹${state.balance.toLocaleString()})`;
+            } else {
+                hint.style.color = 'var(--text-secondary)';
+                hint.innerText = `Available: ₹${state.balance.toLocaleString()}`;
+            }
+        }
+
+        function simulateScan() {
+            switchMobileContent('m-home');
+            startPayment("Scanned Merchant");
+        }
+
+        function closePayment() {
+            document.getElementById('payment-overlay').classList.remove('active');
+            document.getElementById('risk-modal').classList.remove('show');
+            document.getElementById('balance-error-modal').classList.remove('show');
+            document.getElementById('success-screen').classList.remove('active');
+        }
+
+        // Profile Modal Logic
+        function openProfileModal() {
+            document.getElementById('profile-modal').classList.add('show');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.remove('show');
+        }
+
+        function processPayment() {
+            const amt = parseInt(document.getElementById('amount-input').value);
+            if (!amt || amt <= 0) return alert("Please enter valid amount");
+            
+            // BALANCE CHECK LOGIC
+            if (amt > state.balance) {
+                document.getElementById('balance-error-modal').classList.add('show');
+                return;
             }
 
-            // Upgrade button
-            const upgradeBtn = document.querySelector('.btn-upgrade');
-            upgradeBtn.addEventListener('click', () => {
-                const upgradeHtml = `
-                    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;" onclick="this.remove()">
-                        <div style="background: linear-gradient(135deg, rgba(40, 30, 35, 0.95) 0%, rgba(35, 25, 30, 0.95) 100%); backdrop-filter: blur(20px); border: 1px solid rgba(255, 77, 109, 0.3); border-radius: 24px; padding: 48px; width: 600px; text-align: center;" onclick="event.stopPropagation()">
-                            <div style="font-size: 48px; margin-bottom: 16px;">🚀</div>
-                            <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Upgrade to Pro</h2>
-                            <p style="color: var(--text-secondary); margin-bottom: 32px;">Unlock advanced fraud detection features</p>
-                            
-                            <div style="text-align: left; margin-bottom: 32px;">
-                                <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; margin-bottom: 12px;">
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <i class="fas fa-check" style="color: var(--success);"></i>
-                                        <span>Real-time AI-powered scam detection</span>
-                                    </div>
-                                </div>
-                                <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; margin-bottom: 12px;">
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <i class="fas fa-check" style="color: var(--success);"></i>
-                                        <span>Advanced analytics & custom reports</span>
-                                    </div>
-                                </div>
-                                <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 12px; margin-bottom: 12px;">
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <i class="fas fa-check" style="color: var(--success);"></i>
-                                        <span>Priority support & instant alerts</span>
-                                    </div>
-                                </div>
-                                <div style="padding: 16px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <i class="fas fa-check" style="color: var(--success);"></i>
-                                        <span>API access & integrations</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 12px;">
-                                <button onclick="this.closest('[style*=fixed]').remove()" style="flex: 1; padding: 16px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">Maybe Later</button>
-                                <button onclick="alert('Redirecting to payment...'); this.closest('[style*=fixed]').remove();" style="flex: 1; padding: 16px; background: linear-gradient(135deg, var(--primary) 0%, #ff6b8a 100%); border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">Get Pro Now - $49/mo</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                document.body.insertAdjacentHTML('beforeend', upgradeHtml);
+            // --- RISK ENGINE (SIMULATED) ---
+            const isRisky = amt > 10000 || state.payee.includes('Crypto');
+
+            if (isRisky) {
+                document.getElementById('risk-modal').classList.add('show');
+            } else {
+                executeTransaction(amt);
+            }
+        }
+
+        function confirmPay() {
+            const amt = parseInt(document.getElementById('amount-input').value);
+            document.getElementById('risk-modal').classList.remove('show');
+            executeTransaction(amt);
+        }
+
+        function executeTransaction(amt) {
+            state.balance -= amt;
+            updateBalanceUI();
+            
+            // Add to history
+            state.history.unshift({
+                title: state.payee,
+                date: "Just now",
+                amount: `- ₹ ${amt.toLocaleString()}`,
+                type: "debit"
             });
+            renderHistory();
 
-            // Generate CSV Report
-            function generateCSVReport() {
-                const headers = ['Transaction ID', 'Sender', 'Receiver', 'Amount', 'Risk Level', 'Timestamp', 'Detection Mode'];
-                const data = [
-                    ['#TXN-8734', 'user_1847', 'receiver_2983', '₹16,810', 'High Risk', new Date().toISOString(), detectionMode],
-                    ['#TXN-8733', 'user_1523', 'receiver_8471', '₹15,032', 'Medium Risk', new Date().toISOString(), detectionMode],
-                    ['#TXN-8732', 'user_2947', 'receiver_5623', '₹15,012', 'Low Risk', new Date().toISOString(), detectionMode],
-                    ['#TXN-8731', 'user_3891', 'receiver_1247', '₹13,235', 'High Risk', new Date().toISOString(), detectionMode],
-                    ['#TXN-8730', 'user_5624', 'receiver_7893', '₹12,095', 'Low Risk', new Date().toISOString(), detectionMode]
-                ];
-                
-                const csv = [headers, ...data].map(row => row.join(',')).join('\n');
-                return csv;
-            }
+            document.getElementById('success-amount').innerText = `₹ ${amt.toLocaleString()}`;
+            document.getElementById('success-tid').innerText = `#TXN-${Math.floor(Math.random()*90000)+10000}`;
+            document.getElementById('success-screen').classList.add('active');
 
-            // Update Transaction Table with new data
-            function updateTransactionTable() {
-                const tbody = document.getElementById('transactionTable');
-                const riskLevels = ['high', 'medium', 'low'];
-                const riskTexts = ['High Risk', 'Medium Risk', 'Low Risk'];
-                
-                // Simulate new transactions
-                const newTxnId = Math.floor(Math.random() * 9000) + 1000;
-                const randomRisk = Math.floor(Math.random() * 3);
-                
-                // Keep only last 5 transactions
-                if (tbody.children.length >= 5) {
-                    tbody.removeChild(tbody.lastChild);
-                }
-                
-                const newRow = `
-                    <tr style="animation: fadeInUp 0.5s ease;">
-                        <td><span style="font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);">#TXN-${newTxnId}</span></td>
-                        <td>user_${Math.floor(Math.random() * 9000) + 1000}</td>
-                        <td>receiver_${Math.floor(Math.random() * 9000) + 1000}</td>
-                        <td class="amount">₹${(Math.random() * 50000 + 10000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
-                        <td>
-                            <span class="status-badge ${riskLevels[randomRisk]}">
-                                <span class="status-dot"></span>
-                                ${riskTexts[randomRisk]}
-                            </span>
-                        </td>
-                        <td>Just now</td>
-                        <td><button class="action-btn">View</button></td>
-                    </tr>
+            setTimeout(() => {
+                closePayment();
+                switchMobileContent('m-home'); // Return to home
+            }, 2500);
+        }
+
+        // ==========================
+        // 3. ADMIN DASHBOARD LOGIC
+        // ==========================
+        function initAdminDashboard() {
+            // Populate Dummy Live Feed
+            const feed = document.getElementById('admin-feed');
+            const dummyData = [
+                { id: "#TXN-9982", from: "Anita Roy", to: "Shopping Mall", amt: 2400, risk: "Safe" },
+                { id: "#TXN-9983", from: "Rahul S.", to: "Crypto Hub", amt: 50000, risk: "High" },
+                { id: "#TXN-9984", from: "John Doe", to: "Coffee Shop", amt: 150, risk: "Safe" },
+                { id: "#TXN-9985", from: "Rahul S.", to: "Unknown User", amt: 12000, risk: "Medium" },
+                { id: "#TXN-9986", from: "Priya K.", to: "Ravi Kumar", amt: 500, risk: "Safe" },
+                { id: "#TXN-9987", from: "System", to: "Maintenance", amt: 0, risk: "Safe" },
+                { id: "#TXN-9988", from: "Bot_01", to: "Server A", amt: 99999, risk: "High" },
+            ];
+
+            feed.innerHTML = dummyData.map(t => {
+                const badgeClass = t.risk === 'High' ? 'badge-risk' : (t.risk === 'Medium' ? 'badge-warning' : 'badge-safe');
+                return `
+                <div class="feed-row" onclick="openAdminModal('${t.id}', '${t.amt}', '${t.risk}')" data-tooltip="Inspect Transaction">
+                    <span style="font-family: monospace;">${t.id}</span>
+                    <span>${t.from} &rarr; ${t.to}</span>
+                    <span style="font-weight: 600;">₹ ${t.amt.toLocaleString()}</span>
+                    <span><span class="badge ${badgeClass}">${t.risk} Risk</span></span>
+                </div>
                 `;
-                
-                tbody.insertAdjacentHTML('afterbegin', newRow);
-                setupTableActionButtons();
-            }
+            }).join('');
+        }
 
-            // Update Metrics
-            function updateMetrics() {
-                const totalOrders = document.querySelector('.stat-value');
-                if (totalOrders) {
-                    const currentValue = parseInt(totalOrders.textContent.replace(/[^0-9]/g, ''));
-                    const newValue = currentValue + Math.floor(Math.random() * 10);
-                    totalOrders.childNodes[0].textContent = (newValue / 1000).toFixed(1) + 'K';
-                }
-            }
+        // --- Desktop Tab Switching ---
+        function switchDesktopTab(tabId) {
+            document.querySelectorAll('.d-tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
 
-            // Real-time updates
-            let updateInterval;
-            function startRealTimeUpdates() {
-                updateInterval = setInterval(() => {
-                    if (currentView === 'dashboard') {
-                        const shouldUpdate = Math.random() > 0.7; // 30% chance each interval
-                        if (shouldUpdate) {
-                            updateTransactionTable();
-                            updateMetrics();
-                        }
-                    }
-                }, 8000); // Update every 8 seconds
-            }
+            // Update Sidebar Active State
+            document.querySelectorAll('.nav-icon').forEach(el => el.classList.remove('active'));
+            if(tabId === 'd-tab-analytics') document.getElementById('nav-analytics').classList.add('active');
+            if(tabId === 'd-tab-users') document.getElementById('nav-users').classList.add('active');
+            if(tabId === 'd-tab-rules') document.getElementById('nav-rules').classList.add('active');
+        }
 
-            // Initial setup
-            setupTableActionButtons();
+        function openAdminModal(id, amt, risk) {
+            document.getElementById('modal-id').innerText = id;
+            document.getElementById('modal-amt').innerText = `₹ ${parseInt(amt).toLocaleString()}`;
+            document.getElementById('admin-modal').classList.add('active');
+        }
 
-            // Add CSS animations
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-                @keyframes slideIn {
-                    from { transform: translateX(400px); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(400px); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
-        });
+        function closeAdminModal(e) {
+            if (e && e.target !== e.currentTarget) return; // Allow closing only on overlay click or button
+            document.getElementById('admin-modal').classList.remove('active');
+        }
+        
+        // --- Admin Profile Logic ---
+        function openAdminProfile() {
+            document.getElementById('admin-profile-modal').classList.add('active');
+        }
+
+        function closeAdminProfile(e) {
+            if (e && e.target !== e.currentTarget) return; // Allow closing only on overlay click or button
+            document.getElementById('admin-profile-modal').classList.remove('active');
+        }
+
     </script>
 </body>
 </html>
